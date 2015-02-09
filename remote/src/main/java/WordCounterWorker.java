@@ -1,6 +1,6 @@
-package java;
+package remote.jv;
 
-import scala.*;
+import remote.sc.*;
 import akka.actor.UntypedActor;
 
 public class WordCounterWorker extends UntypedActor {

@@ -1,24 +1,12 @@
-package scala
+package remote.sc
 
 import akka.actor._
 import countwords._
 import java.io.File
 import scala.io.Source
-import java.WordCounterWorker
+import remote.jv.WordCounterWorker
 
-class WordCountMaster extends Actor {
-  /*def countWords(fileName: String): Int = {
-    val dataFile = new File(fileName)
-    Source.fromFile(dataFile).getLines.foldRight(0)(_.split(" ").size + _)
-  }
-  def receive: Receive = {
-    case FileToCount(fileName: String) ⇒
-      val count = countWords(fileName)
-      sender ! WordCount(fileName, count)
-  }
-  override def postStop(): Unit = {
-    println(s"Worker actor is stopped: ${self}")
-  }*/
+class WordCountMaster extends Actor with ActorLogging{
 
   var fileNames: Seq[String] = Nil
   var sortedCount: Seq[(String, Int)] = Nil
@@ -29,12 +17,10 @@ class WordCountMaster extends Actor {
       fileNames = urls
       beginSorting(fileNames, workers)
     case WordCount(fileName, count) ⇒
-      // sortedCount = sortedCount :+ (fileName, count)
-      // sortedCount = sortedCount.sortWith(_._2 < _._2)
       sortedCount = (sortedCount :+ (fileName, count)).sortWith(_._2 < _._2)
-      // sortedCount = sortedCount.sortWith(_._2 < _._2)
       if (sortedCount.size == fileNames.size) {
-        println(s"final result $sortedCount")
+        // println(s"final result $sortedCount")
+        log.info(s"Final result $sortedCount")
         finishSorting()
       }
   }
@@ -51,4 +37,9 @@ class WordCountMaster extends Actor {
   private[this] def finishSorting() {
     context.system.shutdown()
   }
+}
+
+object WordCountMaster {
+
+  def props = Props[WordCountMaster]
 }

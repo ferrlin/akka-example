@@ -1,9 +1,10 @@
-package scala
+package remote.sc
 
 import akka.actor._
 import com.typesafe.config.ConfigFactory
 import scala.io.Source
 import java.net.URL
+import WordCountMaster._
 
 case class FileToCount(url: String) {
   def countWords = {
@@ -26,16 +27,12 @@ object MainSystem extends App {
     }
   }
 
-  // override def main(args: Array[String]) = run
-
   // let's start
   run()
 
   private def run() = {
-    val mainSystem = ActorSystem("main",
-      ConfigFactory.load.getConfig("mainsystem"))
-    val accumulator = mainSystem.actorOf(Props[WordCountMaster],
-      name = "wordCountMaster")
+    val mainSystem = ActorSystem("main", ConfigFactory.load.getConfig("mainsystem"))
+    val accumulator = mainSystem.actorOf(WordCountMaster.props, name = "wordCountMaster")
     val m = mainSystem.actorOf(Props(new MainActor(accumulator)))
     m ! "start"
   }
